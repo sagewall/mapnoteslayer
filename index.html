@@ -1,13 +1,159 @@
-<!doctype html>
+<!DOCTYPE html>
 <html lang="en">
   <head>
     <meta charset="UTF-8" />
     <link rel="icon" type="image/svg+xml" href="/vite.svg" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <title>mapnoteslayer</title>
+    <title>MapNotesLayer Sample</title>
   </head>
   <body>
-    <div id="app"></div>
+    <calcite-shell class="calcite-mode-auto">
+      <arcgis-map center="-104.9903, 39.7392" zoom="10">
+        <arcgis-zoom slot="top-left"></arcgis-zoom>
+        <arcgis-expand
+          expand-icon="question"
+          expand-tooltip="How to use this sample"
+          expanded
+          slot="top-left"
+        >
+          <calcite-panel class="width-30" heading="Instructions">
+            <calcite-list>
+              <calcite-list-item
+                description="Use the top right action bar to create points, polylines, polygons, and text graphics. Use the delete action to remove all graphics. Added graphics appear in the MapNotesLayer and can be given a title in the Attributes panel at the bottom left. When drawing text, the title entered in the Attributes panel will be used as the text for the TextSymbol."
+                label="Toolbar"
+              ></calcite-list-item>
+              <calcite-list-item
+                description="Click a graphic on the map to move it, edit its vertices (for polylines and polygons), or change its title in the Attributes panel."
+                label="Selecting a feature"
+              ></calcite-list-item>
+              <calcite-list-item
+                description="Click the Save button to create a new WebMap with your current map notes."
+                label="Saving"
+              ></calcite-list-item>
+            </calcite-list>
+          </calcite-panel>
+        </arcgis-expand>
+        <arcgis-expand slot="top-left">
+          <arcgis-layer-list class="width-30"></arcgis-layer-list>
+        </arcgis-expand>
+        <calcite-action-bar
+          expand-disabled
+          id="draw-action-bar"
+          layout="horizontal"
+          slot="top-right"
+        >
+          <calcite-tooltip
+            placement="bottom-start"
+            reference-element="draw-point-action"
+          >
+            <span>Draw point</span>
+          </calcite-tooltip>
+          <calcite-action
+            icon="pin"
+            id="draw-point-action"
+            text="Draw point"
+          ></calcite-action>
+          <calcite-tooltip
+            placement="bottom-start"
+            reference-element="draw-polyline-action"
+          >
+            <span>Draw polyline</span>
+          </calcite-tooltip>
+          <calcite-action
+            icon="line"
+            id="draw-polyline-action"
+            text="Draw polyline"
+          ></calcite-action>
+          <calcite-tooltip
+            placement="bottom-start"
+            reference-element="draw-polygon-action"
+          >
+            <span>Draw polygon</span>
+          </calcite-tooltip>
+          <calcite-action
+            icon="polygon"
+            id="draw-polygon-action"
+            text="Draw polygon"
+          ></calcite-action>
+          <calcite-tooltip
+            placement="bottom-start"
+            reference-element="draw-text-action"
+          >
+            <span>Draw text</span>
+          </calcite-tooltip>
+          <calcite-action
+            icon="text"
+            id="draw-text-action"
+            text="Draw text"
+          ></calcite-action>
+          <calcite-tooltip
+            placement="bottom-start"
+            reference-element="delete-action"
+          >
+            <span>Delete all graphics</span>
+          </calcite-tooltip>
+          <calcite-action
+            icon="trash"
+            id="delete-action"
+            text="Delete all graphics"
+          ></calcite-action>
+        </calcite-action-bar>
+        <calcite-panel heading="Attributes" slot="bottom-left">
+          <calcite-label class="padding-1"
+            >Title
+            <calcite-input-text
+              class="width-30"
+              id="attribute-title-input-text"
+              value="Hello World!"
+            ></calcite-input-text>
+          </calcite-label>
+        </calcite-panel>
+        <calcite-panel heading="Save WebMap" slot="bottom-right">
+          <calcite-label class="padding-1"
+            >WebMap title
+            <calcite-input-text
+              class="width-30"
+              id="webmap-title-input-text"
+              value="Map Notes Webmap"
+            ></calcite-input-text>
+          </calcite-label>
+          <calcite-button
+            appearance="solid"
+            class="padding-0-1-1-1"
+            id="save-webmap"
+            >Save</calcite-button
+          >
+        </calcite-panel>
+      </arcgis-map>
+      <calcite-dialog
+        heading="Saved Webmap Information"
+        id="save-results-dialog"
+        modal
+      >
+        <calcite-panel>
+          <calcite-loader
+            id="save-loader"
+            label="Saving Webmap"
+            text="Saving Webmap"
+          ></calcite-loader>
+          <calcite-notice icon id="save-success-notice" kind="success">
+            <div slot="title">The Webmap has been saved successfully</div>
+            <div slot="message">
+              <calcite-link
+                id="save-success-link"
+                slot="message"
+                target="_blank"
+                >Test</calcite-link
+              >
+            </div>
+          </calcite-notice>
+          <calcite-notice icon id="save-error-notice" kind="danger">
+            <div slot="title">The Webmap could not be saved</div>
+            <div id="save-error-message" slot="message"></div>
+          </calcite-notice>
+        </calcite-panel>
+      </calcite-dialog>
+    </calcite-shell>
     <script type="module" src="/src/main.ts"></script>
   </body>
 </html>

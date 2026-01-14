@@ -1,1 +1,1 @@
-# MapnotesLayer Sample
+# MapNotesLayer Sample
