@@ -99,7 +99,7 @@ const saveSuccessNotice = document.querySelector(
 )! as HTMLCalciteNoticeElement;
 
 // Button element for saving the web map.
-const saveWebmapButton = document.querySelector(
+const saveWebMapButton = document.querySelector(
   "#save-webmap"
 )! as HTMLCalciteButtonElement;
 
@@ -237,7 +237,7 @@ drawTextAction.addEventListener("click", () => {
   });
 });
 
-// Event listener for updating the graphic title attributes
+// Event listener for updating the graphic title attribute
 // when the input value changes.
 attributeTitleInput.addEventListener("calciteInputTextChange", () => {
   if (currentUpdatingSketchViewModel) {
@@ -252,33 +252,35 @@ saveResultsDialog.addEventListener("calciteDialogClose", () => {
   saveErrorNotice.open = false;
 });
 
-// Event listener for saving the webmap.
-saveWebmapButton.addEventListener("click", async () => {
+// Event listener for saving the WebMap.
+saveWebMapButton.addEventListener("click", async () => {
   try {
     // Open the save results dialog.
     saveResultsDialog.open = true;
 
-    // Get the webmap title from the input field.
-    const title = webMapTitleInput.value || "Map Notes Webmap";
+    // Get the WebMap title from the input field.
+    const title = webMapTitleInput.value || "Map Notes WebMap";
 
-    // Update the webmap with the current view.
+    // Update the WebMap with the current view.
     await webMap.updateFrom(viewElement.view);
 
-    // Create a new portal item with the webmap title.
+    // Create a new PortalItem with the WebMap title.
     const portalItem = new PortalItem({
+      description:
+        "WebMap created with the ArcGIS Maps SDK for JavaScript MapNotesLayer sample",
       title,
     });
 
-    // Save the webmap as a new portal item.
+    // Save the WebMap as a new PortalItem.
     const saveAsResult = await webMap.saveAs(portalItem);
 
-    // Update the save success link with the new portal item URL.
+    // Update the save success link with the new PortalItem URL.
     saveSuccessLink.href = `${saveAsResult.portal.url}/home/item.html?id=${saveAsResult.id}`;
     saveSuccessLink.textContent = saveAsResult.title ?? "";
     saveLoader.hidden = true;
     saveSuccessNotice.open = true;
   } catch (error) {
-    // Display the error message if the webmap save fails.
+    // Display the error message if the WebMap save fails.
     saveErrorMessage.textContent = (error as Error).message;
     saveLoader.hidden = true;
     saveErrorNotice.open = true;
@@ -325,7 +327,7 @@ function resetActions() {
   drawActionBar.querySelectorAll("calcite-action").forEach((action) => {
     action.indicator = false;
   });
-  // Cancel all active sketch view models.
+  // Cancel all active SketchViewModels.
   pointSketchViewModel.cancel();
   polylineSketchViewModel.cancel();
   polygonSketchViewModel.cancel();
@@ -340,7 +342,7 @@ function updateAttributes(
   if (event.state === "start") {
     // When the update starts, populate the input with the current graphic title.
     attributeTitleInput.value = event.graphics[0].attributes?.title || "";
-    // Set the current updating sketch view model when the update starts.
+    // Set the current updating SketchViewModel when the update starts.
     currentUpdatingSketchViewModel = sketchViewModel;
   } else if (event.state === "complete") {
     // When the update is complete, update the graphic title attribute.
@@ -353,7 +355,7 @@ function updateAttributes(
     }
     // Blur the input so it loses focus.
     attributeTitleInput.blur();
-    // Clear the current updating sketch view model.
+    // Clear the current updating SketchViewModel.
     currentUpdatingSketchViewModel = null;
   }
 }
