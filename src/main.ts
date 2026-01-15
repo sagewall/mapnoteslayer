@@ -267,7 +267,7 @@ saveWebMapButton.addEventListener("click", async () => {
     // Create a new PortalItem with the WebMap title.
     const portalItem = new PortalItem({
       description:
-        "WebMap created with the ArcGIS Maps SDK for JavaScript MapNotesLayer sample",
+        "WebMap created with the ArcGIS Maps SDK for JavaScript MapNotesLayer sample.",
       title,
     });
 
