@@ -1,9 +1,11 @@
+import type GraphicsLayer from "@arcgis/core/layers/GraphicsLayer.js";
 import MapNotesLayer from "@arcgis/core/layers/MapNotesLayer.js";
 import PortalItem from "@arcgis/core/portal/PortalItem.js";
 import SimpleFillSymbol from "@arcgis/core/symbols/SimpleFillSymbol.js";
 import SimpleLineSymbol from "@arcgis/core/symbols/SimpleLineSymbol.js";
 import SimpleMarkerSymbol from "@arcgis/core/symbols/SimpleMarkerSymbol.js";
 import TextSymbol from "@arcgis/core/symbols/TextSymbol.js";
+import type MapView from "@arcgis/core/views/MapView.js";
 import WebMap from "@arcgis/core/WebMap.js";
 import SketchViewModel from "@arcgis/core/widgets/Sketch/SketchViewModel.js";
 import type {
@@ -24,11 +26,11 @@ import "@esri/calcite-components/components/calcite-label";
 import "@esri/calcite-components/components/calcite-link";
 import "@esri/calcite-components/components/calcite-list";
 import "@esri/calcite-components/components/calcite-list-item";
+import "@esri/calcite-components/components/calcite-loader";
 import "@esri/calcite-components/components/calcite-notice";
 import "@esri/calcite-components/components/calcite-panel";
 import "@esri/calcite-components/components/calcite-shell";
 import "@esri/calcite-components/components/calcite-tooltip";
-import "@esri/calcite-components/components/calcite-loader";
 import "./style.css";
 
 // Input element for the title attribute for the map note graphic.
@@ -129,68 +131,27 @@ viewElement.map = webMap;
 // Destructure the individual layers from the map notes layer.
 const { pointLayer, polylineLayer, polygonLayer, textLayer } = mapNotesLayer;
 
-// SketchViewModel for drawing point map note graphics.
-const pointSketchViewModel = new SketchViewModel({
+// Create SketchViewModels for each geometry type using the
+// createSketchViewModel factory function.
+const pointSketchViewModel = createSketchViewModel({
   view: viewElement.view,
   layer: pointLayer,
+  action: drawPointAction,
 });
-
-// Event listener for creating point map note graphics.
-pointSketchViewModel.on("create", (event) => {
-  createAttributes(drawPointAction, event);
-});
-
-// Event listener for updating point map note graphics.
-pointSketchViewModel.on("update", (event) => {
-  updateAttributes(pointSketchViewModel, event);
-});
-
-// SketchViewModel for drawing polygon map note graphics.
-const polygonSketchViewModel = new SketchViewModel({
+const polygonSketchViewModel = createSketchViewModel({
   view: viewElement.view,
   layer: polygonLayer,
+  action: drawPolygonAction,
 });
-
-// Event listener for creating polygon map note graphics.
-polygonSketchViewModel.on("create", (event) => {
-  createAttributes(drawPolygonAction, event);
-});
-
-// Event listener for updating polygon map note graphics.
-polygonSketchViewModel.on("update", (event) => {
-  updateAttributes(polygonSketchViewModel, event);
-});
-
-// SketchViewModel for drawing polyline map note graphics.
-const polylineSketchViewModel = new SketchViewModel({
+const polylineSketchViewModel = createSketchViewModel({
   view: viewElement.view,
   layer: polylineLayer,
+  action: drawPolylineAction,
 });
-
-// Event listener for creating polyline map note graphics.
-polylineSketchViewModel.on("create", (event) => {
-  createAttributes(drawPolylineAction, event);
-});
-
-// Event listener for updating polyline map note graphics.
-polylineSketchViewModel.on("update", (event) => {
-  updateAttributes(polylineSketchViewModel, event);
-});
-
-// SketchViewModel for drawing text map note graphics.
-const textSketchViewModel = new SketchViewModel({
+const textSketchViewModel = createSketchViewModel({
   view: viewElement.view,
   layer: textLayer,
-});
-
-// Event listener for creating text map note graphics.
-textSketchViewModel.on("create", (event) => {
-  createAttributes(drawTextAction, event);
-});
-
-// Event listener for updating text map note graphics.
-textSketchViewModel.on("update", (event) => {
-  updateAttributes(textSketchViewModel, event);
+  action: drawTextAction,
 });
 
 // Event listener for deleting all map note graphics.
@@ -337,6 +298,25 @@ function createAttributes(
     // Reset the action indicator when the creation is complete.
     action.indicator = false;
   }
+}
+
+// Function to create a SketchViewModel and set up event listeners.
+function createSketchViewModel(options: {
+  view: MapView;
+  layer: GraphicsLayer | null | undefined;
+  action: HTMLCalciteActionElement;
+}) {
+  const sketchViewModel = new SketchViewModel({
+    view: options.view,
+    layer: options.layer,
+  });
+  sketchViewModel.on("create", (event) => {
+    createAttributes(options.action, event);
+  });
+  sketchViewModel.on("update", (event) => {
+    updateAttributes(sketchViewModel, event);
+  });
+  return sketchViewModel;
 }
 
 // Function for resetting all drawing actions.
