@@ -308,10 +308,13 @@ function createSketchViewModel(options: {
   layer: GraphicsLayer | null | undefined;
   action: HTMLCalciteActionElement;
 }) {
+  // Create a new SketchViewModel with the provided options.
   const sketchViewModel = new SketchViewModel({
     view: options.view,
     layer: options.layer,
   });
+
+  // Set up event listeners for the SketchViewModel.
   sketchViewModel.on("create", (event) => {
     createAttributes(options.action, event);
   });
