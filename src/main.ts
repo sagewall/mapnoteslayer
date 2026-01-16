@@ -121,6 +121,11 @@ const saveWebMapButton = document.querySelector(
   "#save-webmap"
 )! as HTMLCalciteButtonElement;
 
+// Action element for selecting and updating map note graphics.
+const selectAction = document.querySelector(
+  "#select-action"
+)! as HTMLCalciteActionElement;
+
 // Map element for displaying the map.
 const viewElement = document.querySelector(
   "arcgis-map"
@@ -199,6 +204,9 @@ drawPointAction.addEventListener("click", () => {
   // Reset all drawing actions.
   resetActions();
 
+  // Disable updates on SketchViewModels.
+  disableUpdates();
+
   // Show the attribute panel when a new graphic is created.
   attributePanel.hidden = false;
 
@@ -224,6 +232,9 @@ drawPolygonAction.addEventListener("click", () => {
   // Reset all drawing actions.
   resetActions();
 
+  // Disable updates on SketchViewModels.
+  disableUpdates();
+
   // Show the attribute panel when a new graphic is created.
   attributePanel.hidden = false;
 
@@ -247,6 +258,9 @@ drawPolylineAction.addEventListener("click", () => {
   // Reset all drawing actions.
   resetActions();
 
+  // Disable updates on SketchViewModels.
+  disableUpdates();
+
   // Show the attribute panel when a new graphic is created.
   attributePanel.hidden = false;
 
@@ -266,6 +280,9 @@ drawPolylineAction.addEventListener("click", () => {
 drawTextAction.addEventListener("click", () => {
   // Reset all drawing actions.
   resetActions();
+
+  // Disable updates on SketchViewModels.
+  disableUpdates();
 
   // Show the attribute panel when a new graphic is created.
   attributePanel.hidden = false;
@@ -338,6 +355,29 @@ saveWebMapButton.addEventListener("click", async () => {
   }
 });
 
+// Event listener for selecting and updating map note graphics.
+selectAction.addEventListener("click", () => {
+  // If the select action is already active, reset all actions
+  // and disable updates.
+  if (selectAction.indicator) {
+    resetActions();
+    disableUpdates();
+    return;
+  }
+  // Otherwise, reset all actions and enable updates.
+  resetActions();
+  selectAction.indicator = true;
+  allowUpdates();
+});
+
+// Function to allow updates on all SketchViewModels.
+function allowUpdates() {
+  pointSketchViewModel.updateOnGraphicClick = true;
+  polylineSketchViewModel.updateOnGraphicClick = true;
+  polygonSketchViewModel.updateOnGraphicClick = true;
+  textSketchViewModel.updateOnGraphicClick = true;
+}
+
 // Function for creating attributes for a new graphic.
 function createAttributes(
   action: HTMLCalciteActionElement,
@@ -355,7 +395,16 @@ function createAttributes(
     event.graphic.attributes = {
       title: attributeTitleInput.value || "",
     };
+
+    // Add a popup template to the new graphic.
+    event.graphic.popupTemplate = {
+      title: "{title}",
+    };
+
+    // Clear the action indicator and hide the attribute panel.
     action.indicator = false;
+
+    // Hide the attribute panel after creating a new graphic.
     attributePanel.hidden = true;
 
     // Re-enable all actions after creating a new graphic.
@@ -375,6 +424,7 @@ function createSketchViewModel(options: {
   const sketchViewModel = new SketchViewModel({
     view: options.view,
     layer: options.layer,
+    updateOnGraphicClick: false,
   });
 
   // Set up event listeners for the SketchViewModel.
@@ -394,6 +444,14 @@ function createSketchViewModel(options: {
     updateAttributes(sketchViewModel, event);
   });
   return sketchViewModel;
+}
+
+// Function to disable updates on all SketchViewModels.
+function disableUpdates() {
+  pointSketchViewModel.updateOnGraphicClick = false;
+  polylineSketchViewModel.updateOnGraphicClick = false;
+  polygonSketchViewModel.updateOnGraphicClick = false;
+  textSketchViewModel.updateOnGraphicClick = false;
 }
 
 // Function for resetting all drawing actions.

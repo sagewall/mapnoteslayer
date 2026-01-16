@@ -89,6 +89,18 @@
 
           <calcite-tooltip
             placement="bottom-start"
+            reference-element="select-action"
+          >
+            <span>Select graphic and edit attributes</span>
+          </calcite-tooltip>
+          <calcite-action
+            icon="select"
+            id="select-action"
+            text="Select graphic and edit attributes"
+          ></calcite-action>
+
+          <calcite-tooltip
+            placement="bottom-start"
             reference-element="delete-action"
           >
             <span>Delete all graphics</span>
@@ -105,7 +117,7 @@
             >Edit the title:
             <calcite-input-text
               id="attribute-title-input-text"
-              value="Hello World!"
+              value="Map Note Title"
             ></calcite-input-text>
           </calcite-label>
         </calcite-panel>
