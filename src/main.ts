@@ -33,6 +33,11 @@ import "@esri/calcite-components/components/calcite-shell";
 import "@esri/calcite-components/components/calcite-tooltip";
 import "./style.css";
 
+// Attribute panel for editing the title attribute of the selected map note graphic.
+const attributePanel = document.querySelector(
+  "#attribute-panel"
+)! as HTMLCalcitePanelElement;
+
 // Input element for the title attribute for the map note graphic.
 const attributeTitleInput = document.querySelector(
   "#attribute-title-input-text"
@@ -42,6 +47,19 @@ const attributeTitleInput = document.querySelector(
 const deleteAction = document.querySelector(
   "#delete-action"
 )! as HTMLCalciteActionElement;
+
+const deleteConfirmButton = document.querySelector(
+  "#delete-confirm-button"
+)! as HTMLCalciteButtonElement;
+
+const deleteCancelButton = document.querySelector(
+  "#delete-cancel-button"
+)! as HTMLCalciteButtonElement;
+
+// Dialog element for confirming deletion of all map note graphics.
+const deleteDialog = document.querySelector(
+  "#delete-dialog"
+)! as HTMLCalciteDialogElement;
 
 // Action bar element for drawing map note graphics.
 const drawActionBar = document.querySelector(
@@ -156,19 +174,37 @@ const textSketchViewModel = createSketchViewModel({
 
 // Event listener for deleting all map note graphics.
 deleteAction.addEventListener("click", () => {
-  resetActions();
+  deleteAction.indicator = true;
+  deleteDialog.open = true;
+});
+
+// Event listener for confirming deletion of all map note graphics.
+deleteConfirmButton.addEventListener("click", () => {
   pointLayer?.removeAll();
   polylineLayer?.removeAll();
   polygonLayer?.removeAll();
   textLayer?.removeAll();
+  deleteDialog.open = false;
+  resetActions();
+});
+
+// Event listener for canceling deletion of all map note graphics.
+deleteCancelButton.addEventListener("click", () => {
+  deleteDialog.open = false;
+  resetActions();
 });
 
 // Event listener for drawing point map note graphics.
 drawPointAction.addEventListener("click", () => {
   // Reset all drawing actions.
   resetActions();
+
+  // Show the attribute panel when a new graphic is created.
+  attributePanel.hidden = false;
+
   // Set the indicator for the draw point action.
   drawPointAction.indicator = true;
+
   // Create a new point graphic with a simple marker symbol.
   pointSketchViewModel.create("point", {
     graphicSymbol: new SimpleMarkerSymbol({
@@ -187,8 +223,13 @@ drawPointAction.addEventListener("click", () => {
 drawPolygonAction.addEventListener("click", () => {
   // Reset all drawing actions.
   resetActions();
+
+  // Show the attribute panel when a new graphic is created.
+  attributePanel.hidden = false;
+
   // Set the indicator for the draw polygon action.
   drawPolygonAction.indicator = true;
+
   // Create a new polygon graphic with a simple fill symbol.
   polygonSketchViewModel.create("polygon", {
     graphicSymbol: new SimpleFillSymbol({
@@ -205,8 +246,13 @@ drawPolygonAction.addEventListener("click", () => {
 drawPolylineAction.addEventListener("click", () => {
   // Reset all drawing actions.
   resetActions();
+
+  // Show the attribute panel when a new graphic is created.
+  attributePanel.hidden = false;
+
   // Set the indicator for the draw polyline action.
   drawPolylineAction.indicator = true;
+
   // Create a new polyline graphic with a simple line symbol.
   polylineSketchViewModel.create("polyline", {
     graphicSymbol: new SimpleLineSymbol({
@@ -220,8 +266,13 @@ drawPolylineAction.addEventListener("click", () => {
 drawTextAction.addEventListener("click", () => {
   // Reset all drawing actions.
   resetActions();
+
+  // Show the attribute panel when a new graphic is created.
+  attributePanel.hidden = false;
+
   // Set the indicator for the draw text action.
   drawTextAction.indicator = true;
+
   // Create a new graphic with a text symbol.
   textSketchViewModel.create("point", {
     graphicSymbol: new TextSymbol({
@@ -232,7 +283,7 @@ drawTextAction.addEventListener("click", () => {
       },
       haloColor: "#00000077",
       haloSize: 1,
-      text: attributeTitleInput.value || "",
+      // text: attributeTitleInput.value || "",
     }),
   });
 });
@@ -292,13 +343,25 @@ function createAttributes(
   action: HTMLCalciteActionElement,
   event: CreateEvent
 ) {
-  // Create attributes for the new graphic when the creation is complete.
   if (event.state === "complete" && event.graphic) {
+    // Clone the current symbol and update the text if it's a text symbol.
+    const symbol = event.graphic.symbol?.clone();
+    if (symbol && symbol.type === "text" && event.graphic) {
+      symbol.text = attributeTitleInput.value || "";
+      event.graphic.symbol = symbol;
+    }
+
+    // Set the initial attributes for the new graphic.
     event.graphic.attributes = {
       title: attributeTitleInput.value || "",
     };
-    // Reset the action indicator when the creation is complete.
     action.indicator = false;
+    attributePanel.hidden = true;
+
+    // Re-enable all actions after creating a new graphic.
+    drawActionBar.querySelectorAll("calcite-action").forEach((action) => {
+      action.disabled = false;
+    });
   }
 }
 
@@ -316,9 +379,18 @@ function createSketchViewModel(options: {
 
   // Set up event listeners for the SketchViewModel.
   sketchViewModel.on("create", (event) => {
+    // Disable all actions while creating a new graphic.
+    drawActionBar.querySelectorAll("calcite-action").forEach((action) => {
+      action.disabled = true;
+    });
     createAttributes(options.action, event);
   });
   sketchViewModel.on("update", (event) => {
+    // Disable all actions while updating a graphic.
+    drawActionBar.querySelectorAll("calcite-action").forEach((action) => {
+      action.disabled = true;
+    });
+    attributePanel.hidden = false;
     updateAttributes(sketchViewModel, event);
   });
   return sketchViewModel;
@@ -345,20 +417,32 @@ function updateAttributes(
   if (event.state === "start") {
     // When the update starts, populate the input with the current graphic title.
     attributeTitleInput.value = event.graphics[0].attributes?.title || "";
+
     // Set the current updating SketchViewModel when the update starts.
     currentUpdatingSketchViewModel = sketchViewModel;
   } else if (event.state === "complete") {
     // When the update is complete, update the graphic title attribute.
     event.graphics[0].attributes.title = attributeTitleInput.value || "";
+
     // Clone the current symbol and update the text if it's a text symbol.
     const symbol = event.graphics[0].symbol?.clone();
     if (symbol && symbol.type === "text") {
       symbol.text = attributeTitleInput.value || "";
       event.graphics[0].symbol = symbol;
     }
+
     // Blur the input so it loses focus.
     attributeTitleInput.blur();
+
     // Clear the current updating SketchViewModel.
     currentUpdatingSketchViewModel = null;
+
+    // Hide the attribute panel after updating a graphic.
+    attributePanel.hidden = true;
+
+    // Enable all actions after updating a graphic.
+    drawActionBar.querySelectorAll("calcite-action").forEach((action) => {
+      action.disabled = false;
+    });
   }
 }

@@ -13,10 +13,9 @@
         <arcgis-expand
           expand-icon="question"
           expand-tooltip="How to use this sample"
-          expanded
           slot="top-left"
         >
-          <calcite-panel class="width-30" heading="Instructions">
+          <calcite-panel class="max-width-450" heading="Instructions">
             <calcite-list>
               <calcite-list-item
                 description="Use the top right action bar to create points, polylines, polygons, and text graphics. Use the delete action to remove all graphics. Added graphics appear in the MapNotesLayer and can be given a title in the Attributes panel at the bottom left. When drawing text, the title entered in the Attributes panel will be used as the text for the TextSymbol."
@@ -33,9 +32,7 @@
             </calcite-list>
           </calcite-panel>
         </arcgis-expand>
-        <arcgis-expand slot="top-left">
-          <arcgis-layer-list class="width-30"></arcgis-layer-list>
-        </arcgis-expand>
+
         <calcite-action-bar
           expand-disabled
           id="draw-action-bar"
@@ -53,6 +50,7 @@
             id="draw-point-action"
             text="Draw point"
           ></calcite-action>
+
           <calcite-tooltip
             placement="bottom-start"
             reference-element="draw-polyline-action"
@@ -64,6 +62,7 @@
             id="draw-polyline-action"
             text="Draw polyline"
           ></calcite-action>
+
           <calcite-tooltip
             placement="bottom-start"
             reference-element="draw-polygon-action"
@@ -75,6 +74,7 @@
             id="draw-polygon-action"
             text="Draw polygon"
           ></calcite-action>
+
           <calcite-tooltip
             placement="bottom-start"
             reference-element="draw-text-action"
@@ -86,6 +86,7 @@
             id="draw-text-action"
             text="Draw text"
           ></calcite-action>
+
           <calcite-tooltip
             placement="bottom-start"
             reference-element="delete-action"
@@ -98,21 +99,21 @@
             text="Delete all graphics"
           ></calcite-action>
         </calcite-action-bar>
-        <calcite-panel heading="Attributes" slot="bottom-left">
+
+        <calcite-panel hidden id="attribute-panel" slot="top-right">
           <calcite-label class="padding-1"
-            >Title
+            >Edit the title:
             <calcite-input-text
-              class="width-30"
               id="attribute-title-input-text"
               value="Hello World!"
             ></calcite-input-text>
           </calcite-label>
         </calcite-panel>
+
         <calcite-panel heading="Save WebMap" slot="bottom-right">
           <calcite-label class="padding-1"
             >WebMap title
             <calcite-input-text
-              class="width-30"
               id="webmap-title-input-text"
               value="Map Notes Webmap"
             ></calcite-input-text>
@@ -125,6 +126,29 @@
           >
         </calcite-panel>
       </arcgis-map>
+
+      <calcite-dialog heading="Delete All Graphics" id="delete-dialog" modal>
+        <calcite-panel>
+          <calcite-notice icon id="delete-notice" kind="danger" open>
+            <div slot="title">All graphics will be deleted</div>
+            <div id="delete-message" slot="message">
+              <span
+                >Are you sure you want to delete all graphics?<br />To delete a
+                single graphic, select it and press the delete key.</span
+              >
+            </div>
+          </calcite-notice>
+          <div class="buttons-container">
+            <calcite-button appearance="solid" id="delete-confirm-button"
+              >Delete</calcite-button
+            >
+            <calcite-button appearance="outline" id="delete-cancel-button"
+              >Cancel</calcite-button
+            >
+          </div>
+        </calcite-panel>
+      </calcite-dialog>
+
       <calcite-dialog
         heading="Saved Webmap Information"
         id="save-results-dialog"
