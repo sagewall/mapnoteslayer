@@ -35,105 +35,105 @@ import "./style.css";
 
 // Attribute panel for editing the title attribute of the selected map note graphic.
 const attributePanel = document.querySelector(
-  "#attribute-panel"
+  "#attribute-panel",
 )! as HTMLCalcitePanelElement;
 
 // Input element for the title attribute for the map note graphic.
 const attributeTitleInput = document.querySelector(
-  "#attribute-title-input-text"
+  "#attribute-title-input-text",
 )! as HTMLCalciteInputTextElement;
 
 // Action element for deleting all map note graphics.
 const deleteAction = document.querySelector(
-  "#delete-action"
+  "#delete-action",
 )! as HTMLCalciteActionElement;
 
 const deleteConfirmButton = document.querySelector(
-  "#delete-confirm-button"
+  "#delete-confirm-button",
 )! as HTMLCalciteButtonElement;
 
 const deleteCancelButton = document.querySelector(
-  "#delete-cancel-button"
+  "#delete-cancel-button",
 )! as HTMLCalciteButtonElement;
 
 // Dialog element for confirming deletion of all map note graphics.
 const deleteDialog = document.querySelector(
-  "#delete-dialog"
+  "#delete-dialog",
 )! as HTMLCalciteDialogElement;
 
 // Action bar element for drawing map note graphics.
 const drawActionBar = document.querySelector(
-  "#draw-action-bar"
+  "#draw-action-bar",
 )! as HTMLCalciteActionBarElement;
 
 // Action element for drawing point map note graphics.
 const drawPointAction = document.querySelector(
-  "#draw-point-action"
+  "#draw-point-action",
 )! as HTMLCalciteActionElement;
 
 // Action element for drawing polygon map note graphics.
 const drawPolygonAction = document.querySelector(
-  "#draw-polygon-action"
+  "#draw-polygon-action",
 )! as HTMLCalciteActionElement;
 
 // Action element for drawing polyline map note graphics.
 const drawPolylineAction = document.querySelector(
-  "#draw-polyline-action"
+  "#draw-polyline-action",
 )! as HTMLCalciteActionElement;
 
 // Action element for drawing text map note graphics.
 const drawTextAction = document.querySelector(
-  "#draw-text-action"
+  "#draw-text-action",
 )! as HTMLCalciteActionElement;
 
 // Div element for displaying save error messages.
 const saveErrorMessage = document.querySelector(
-  "#save-error-message"
+  "#save-error-message",
 )! as HTMLDivElement;
 
 // Notice element for displaying save error messages.
 const saveErrorNotice = document.querySelector(
-  "#save-error-notice"
+  "#save-error-notice",
 )! as HTMLCalciteNoticeElement;
 
 // Loader element for displaying save progress.
 const saveLoader = document.querySelector(
-  "#save-loader"
+  "#save-loader",
 )! as HTMLCalciteLoaderElement;
 
 // Dialog element for displaying save results.
 const saveResultsDialog = document.querySelector(
-  "#save-results-dialog"
+  "#save-results-dialog",
 )! as HTMLCalciteDialogElement;
 
 // Link element for displaying a link to the saved web map.
 const saveSuccessLink = document.querySelector(
-  "#save-success-link"
+  "#save-success-link",
 )! as HTMLCalciteLinkElement;
 
 // Notice element for displaying save success messages.
 const saveSuccessNotice = document.querySelector(
-  "#save-success-notice"
+  "#save-success-notice",
 )! as HTMLCalciteNoticeElement;
 
 // Button element for saving the web map.
 const saveWebMapButton = document.querySelector(
-  "#save-webmap"
+  "#save-webmap",
 )! as HTMLCalciteButtonElement;
 
 // Action element for selecting and updating map note graphics.
 const selectAction = document.querySelector(
-  "#select-action"
+  "#select-action",
 )! as HTMLCalciteActionElement;
 
 // Map element for displaying the map.
 const viewElement = document.querySelector(
-  "arcgis-map"
+  "arcgis-map",
 )! as HTMLArcgisMapElement;
 
 // Input element for the title of the web map.
 const webMapTitleInput = document.querySelector(
-  "#webmap-title-input-text"
+  "#webmap-title-input-text",
 )! as HTMLCalciteInputTextElement;
 
 // Current updating SketchViewModel.
@@ -381,7 +381,7 @@ function allowUpdates() {
 // Function for creating attributes for a new graphic.
 function createAttributes(
   action: HTMLCalciteActionElement,
-  event: CreateEvent
+  event: CreateEvent,
 ) {
   if (event.state === "complete" && event.graphic) {
     // Clone the current symbol and update the text if it's a text symbol.
@@ -470,7 +470,7 @@ function resetActions() {
 // Function for updating the attributes of an existing graphic.
 function updateAttributes(
   sketchViewModel: SketchViewModel,
-  event: UpdateEvent
+  event: UpdateEvent,
 ) {
   if (event.state === "start") {
     // When the update starts, populate the input with the current graphic title.
