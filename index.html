@@ -18,15 +18,19 @@
           <calcite-panel class="max-width-450" heading="Instructions">
             <calcite-list>
               <calcite-list-item
-                description="Use the top right action bar to create points, polylines, polygons, and text graphics. Use the delete action to remove all graphics. Added graphics appear in the MapNotesLayer and can be given a title in the Attributes panel at the bottom left. When drawing text, the title entered in the Attributes panel will be used as the text for the TextSymbol."
+                description="Use the action bar in the top right to draw points, polylines, polygons, or text notes on the map. The delete action removes all graphics. When drawing, an attribute panel appears to let you set a title. For text notes, the title becomes the displayed text."
                 label="Action bar"
               ></calcite-list-item>
               <calcite-list-item
-                description="Click a graphic on the map to move it, edit its vertices (for polylines and polygons), or change its title in the Attributes panel."
-                label="Selecting a feature"
+                description="After adding a graphic, click it to view its popup with the title you entered."
+                label="Viewing popup information"
               ></calcite-list-item>
               <calcite-list-item
-                description="Click the Save button to create a new WebMap with your current map notes."
+                description="Use the select action to pick a graphic and move it, edit its vertices (for lines and polygons), or update its title. The attribute panel will open for editing."
+                label="Selecting and editing features"
+              ></calcite-list-item>
+              <calcite-list-item
+                description="Click the Save button to create a new WebMap with your current map notes. You can set a title for the WebMap before saving."
                 label="Saving"
               ></calcite-list-item>
             </calcite-list>
