@@ -1,4 +1,4 @@
-<!DOCTYPE html>
+<!doctype html>
 <html lang="en">
   <head>
     <meta charset="UTF-8" />
@@ -20,7 +20,7 @@
             <calcite-list>
               <calcite-list-item
                 description="Use the action bar in the top right to draw points, polylines, polygons, or text notes on the map. The delete action removes all graphics. When drawing, an attribute panel appears to let you set a title. For text notes, the title becomes the displayed text."
-                label="Action bar"
+                label="Creating new map notes"
               ></calcite-list-item>
               <calcite-list-item
                 description="After adding a graphic, click it to view its popup with the title you entered."
@@ -119,10 +119,10 @@
 
         <calcite-panel hidden id="attribute-panel" slot="top-right">
           <calcite-label class="padding-1"
-            >Edit the title:
+            >Edit the title attribute:
             <calcite-input-text
               id="attribute-title-input-text"
-              value="Map Note Title"
+              value="Map Note"
             ></calcite-input-text>
           </calcite-label>
         </calcite-panel>
