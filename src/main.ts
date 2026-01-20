@@ -33,6 +33,14 @@ import "@esri/calcite-components/components/calcite-shell";
 import "@esri/calcite-components/components/calcite-tooltip";
 import "./style.css";
 
+// Application state.
+const state = {
+  // Current map note number for default titles.
+  currentMapNoteNumber: 0,
+  // The current SketchViewModel that is being updated.
+  activeSketchViewModel: null as SketchViewModel | null,
+};
+
 // Attribute panel for editing the title attribute of the selected map note graphic.
 const attributePanel = document.querySelector(
   "#attribute-panel",
@@ -138,9 +146,6 @@ const webMapTitleInput = document.querySelector(
   "#webmap-title-input-text",
 )! as HTMLCalciteInputTextElement;
 
-// The current SketchViewModel that is being updated.
-let currentUpdatingSketchViewModel: SketchViewModel | null = null;
-
 // Create a MapNotesLayer to store all user-drawn map note graphics (points, lines, polygons, and text)
 const mapNotesLayer = new MapNotesLayer();
 
@@ -204,11 +209,9 @@ deleteCancelButton.addEventListener("click", () => {
 
 // Event listener for drawing point map note graphics.
 drawPointAction.addEventListener("click", () => {
-  // Reset all drawing actions.
-  resetActions();
-
-  // Disable updates on SketchViewModels.
-  disableUpdates();
+  // Initialize a new map note by resetting actions, disabling updates,
+  // and incrementing the map note number.
+  initializeNewMapNote();
 
   // Show the attribute panel when a new graphic is created.
   attributePanel.hidden = false;
@@ -232,11 +235,9 @@ drawPointAction.addEventListener("click", () => {
 
 // Event listener for drawing polygon map note graphics.
 drawPolygonAction.addEventListener("click", () => {
-  // Reset all drawing actions.
-  resetActions();
-
-  // Disable updates on SketchViewModels.
-  disableUpdates();
+  // Initialize a new map note by resetting actions, disabling updates,
+  // and incrementing the map note number.
+  initializeNewMapNote();
 
   // Show the attribute panel when a new graphic is created.
   attributePanel.hidden = false;
@@ -258,11 +259,9 @@ drawPolygonAction.addEventListener("click", () => {
 
 // Event listener for drawing polyline map note graphics.
 drawPolylineAction.addEventListener("click", () => {
-  // Reset all drawing actions.
-  resetActions();
-
-  // Disable updates on SketchViewModels.
-  disableUpdates();
+  // Initialize a new map note by resetting actions, disabling updates,
+  // and incrementing the map note number.
+  initializeNewMapNote();
 
   // Show the attribute panel when a new graphic is created.
   attributePanel.hidden = false;
@@ -281,11 +280,9 @@ drawPolylineAction.addEventListener("click", () => {
 
 // Event listener for drawing text map note graphics.
 drawTextAction.addEventListener("click", () => {
-  // Reset all drawing actions.
-  resetActions();
-
-  // Disable updates on SketchViewModels.
-  disableUpdates();
+  // Initialize a new map note by resetting actions, disabling updates,
+  // and incrementing the map note number.
+  initializeNewMapNote();
 
   // Show the attribute panel when a new graphic is created.
   attributePanel.hidden = false;
@@ -310,8 +307,8 @@ drawTextAction.addEventListener("click", () => {
 // Event listener for updating the graphic title attribute
 // when the input value changes.
 attributeTitleInput.addEventListener("calciteInputTextChange", () => {
-  if (currentUpdatingSketchViewModel) {
-    currentUpdatingSketchViewModel.complete();
+  if (state.activeSketchViewModel) {
+    state.activeSketchViewModel.complete();
   }
 });
 
@@ -459,6 +456,21 @@ function disableUpdates() {
   textSketchViewModel.updateOnGraphicClick = false;
 }
 
+// Function to initialize a new map note.
+function initializeNewMapNote() {
+  // Reset all drawing actions.
+  resetActions();
+
+  // Disable updates on SketchViewModels.
+  disableUpdates();
+
+  // Increment the current map note number.
+  state.currentMapNoteNumber++;
+
+  // Set a default title for the new graphic.
+  attributeTitleInput.value = `Map Note ${state.currentMapNoteNumber}`;
+}
+
 // Function for resetting all drawing actions.
 function resetActions() {
   // Set all action indicators to false.
@@ -482,8 +494,8 @@ function updateAttributes(
     // Populate the input with the current graphic title.
     attributeTitleInput.value = event.graphics[0].attributes?.title || "";
 
-    // Set the current updating SketchViewModel when the update starts.
-    currentUpdatingSketchViewModel = sketchViewModel;
+    // Set the active SketchViewModel when the update starts.
+    state.activeSketchViewModel = sketchViewModel;
 
     // If the update is complete.
   } else if (event.state === "complete") {
@@ -500,8 +512,8 @@ function updateAttributes(
     // Blur the input so it loses focus.
     attributeTitleInput.blur();
 
-    // Clear the current updating SketchViewModel.
-    currentUpdatingSketchViewModel = null;
+    // Clear the active SketchViewModel.
+    state.activeSketchViewModel = null;
 
     // Hide the attribute panel after updating a graphic.
     attributePanel.hidden = true;
