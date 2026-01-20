@@ -33,165 +33,209 @@ import "@esri/calcite-components/components/calcite-shell";
 import "@esri/calcite-components/components/calcite-tooltip";
 import "./style.css";
 
-// Application state.
+// -----------------------------------------------------------------------
+// Application State
+// -----------------------------------------------------------------------
+
 const state = {
-  // Current map note number for default titles.
+  // Tracks the sequential number used to generate unique default titles for new map notes.
   currentMapNoteNumber: 0,
-  // The current SketchViewModel that is being updated.
+  // Holds a reference to the SketchViewModel currently being edited,
+  // used for attribute synchronization and UI state management.
   activeSketchViewModel: null as SketchViewModel | null,
 };
 
-// Attribute panel for editing the title attribute of the selected map note graphic.
+// -----------------------------------------------------------------------
+// HTML Element References
+// -----------------------------------------------------------------------
+
+// Panel UI element that allows users to view and edit the title
+// of the currently selected map note graphic.
 const attributePanel = document.querySelector(
   "#attribute-panel",
 )! as HTMLCalcitePanelElement;
 
-// Input element for the title attribute for the map note graphic.
+// Text input field where users can enter or edit the title of the selected map note graphic.
 const attributeTitleInput = document.querySelector(
   "#attribute-title-input-text",
 )! as HTMLCalciteInputTextElement;
 
-// Action element for deleting all map note graphics.
+// Action button that initiates the process to delete all map note graphics from the map,
+// prompting user confirmation.
 const deleteAction = document.querySelector(
   "#delete-action",
 )! as HTMLCalciteActionElement;
 
-// Button element for confirming deletion of all map note graphics.
+// Button that, when clicked, confirms the user's intent to delete all map note graphics
+// and executes the deletion action.
 const deleteConfirmButton = document.querySelector(
   "#delete-confirm-button",
 )! as HTMLCalciteButtonElement;
 
-// Button element for canceling deletion of all map note graphics.
+// Button that allows the user to cancel the deletion process and keep all existing map note graphics.
 const deleteCancelButton = document.querySelector(
   "#delete-cancel-button",
 )! as HTMLCalciteButtonElement;
 
-// Dialog element for confirming deletion of all map note graphics.
+// Dialog window that prompts the user to confirm or cancel the deletion of all map note graphics,
+// ensuring intentional action.
 const deleteDialog = document.querySelector(
   "#delete-dialog",
 )! as HTMLCalciteDialogElement;
 
-// Action bar element for drawing map note graphics.
+// Toolbar containing drawing actions for creating new map note graphics
+// of various types (point, line, polygon, text).
 const drawActionBar = document.querySelector(
   "#draw-action-bar",
 )! as HTMLCalciteActionBarElement;
 
-// Action element for drawing point map note graphics.
+// UI control (action button) that enables users to start drawing a new point map note graphic on the map.
 const drawPointAction = document.querySelector(
   "#draw-point-action",
 )! as HTMLCalciteActionElement;
 
-// Action element for drawing polygon map note graphics.
+// UI control (action button) that enables users to start drawing a new polygon map note graphic on the map.
 const drawPolygonAction = document.querySelector(
   "#draw-polygon-action",
 )! as HTMLCalciteActionElement;
 
-// Action element for drawing polyline map note graphics.
+// UI control (action button) that enables users to start drawing a new polyline map note graphic on the map.
 const drawPolylineAction = document.querySelector(
   "#draw-polyline-action",
 )! as HTMLCalciteActionElement;
 
-// Action element for drawing text map note graphics.
+// UI control (action button) that enables users to start drawing a new text map note graphic on the map.
 const drawTextAction = document.querySelector(
   "#draw-text-action",
 )! as HTMLCalciteActionElement;
 
-// Div element for displaying save error messages.
+// Container (div) for displaying detailed error messages to the user when saving the web map fails.
 const saveErrorMessage = document.querySelector(
   "#save-error-message",
 )! as HTMLDivElement;
 
-// Notice element for displaying save error messages.
+// Visual alert (notice) that informs the user when an error occurs during the web map save process.
 const saveErrorNotice = document.querySelector(
   "#save-error-notice",
 )! as HTMLCalciteNoticeElement;
 
-// Loader element for displaying save progress.
+// Visual loading indicator that shows the user when the web map is being saved or processed.
 const saveLoader = document.querySelector(
   "#save-loader",
 )! as HTMLCalciteLoaderElement;
 
-// Dialog element for displaying save results.
+// Dialog window that communicates the outcome of the web map save operation,
+// showing success or error details to the user.
 const saveResultsDialog = document.querySelector(
   "#save-results-dialog",
 )! as HTMLCalciteDialogElement;
 
-// Link element for displaying a link to the saved web map.
+// Direct link that allows the user to access and view the newly saved web map
+// after a successful save operation.
 const saveSuccessLink = document.querySelector(
   "#save-success-link",
 )! as HTMLCalciteLinkElement;
 
-// Notice element for displaying save success messages.
+// Visual alert (notice) that informs the user when the web map has been saved successfully.
 const saveSuccessNotice = document.querySelector(
   "#save-success-notice",
 )! as HTMLCalciteNoticeElement;
 
-// Button element for saving the web map.
+// Button that initiates the process of saving the current web map,
+// including user-drawn map notes, to the portal.
 const saveWebMapButton = document.querySelector(
   "#save-webmap",
 )! as HTMLCalciteButtonElement;
 
-// Action element for selecting and updating map note graphics.
+// Action button that enables users to select existing map note graphics on the map
+// for editing or updating their attributes.
 const selectAction = document.querySelector(
   "#select-action",
 )! as HTMLCalciteActionElement;
 
-// Map element for displaying the map.
+// Main interactive map container that displays the web map and all user-created map note graphics.
 const viewElement = document.querySelector(
   "arcgis-map",
 )! as HTMLArcgisMapElement;
 
-// Input element for the title of the web map.
+// Text input field where users specify or edit the title for the web map before saving it to the portal.
 const webMapTitleInput = document.querySelector(
   "#webmap-title-input-text",
 )! as HTMLCalciteInputTextElement;
 
-// Create a MapNotesLayer to store all user-drawn map note graphics (points, lines, polygons, and text)
+// -----------------------------------------------------------------------
+// MapNotesLayer and Map Setup
+// -----------------------------------------------------------------------
+
+// Dedicated layer for storing and managing all user-created map note graphics—including
+// points, lines, polygons, and text—on the map.
 const mapNotesLayer = new MapNotesLayer();
 
-// Create a WebMap with a gray vector basemap and the map notes layer.
+// Extract individual sublayers for points, polylines, polygons, and text from the MapNotesLayer
+// for direct access and management.
+const { pointLayer, polylineLayer, polygonLayer, textLayer } = mapNotesLayer;
+
+// Instantiate the main WebMap, configured with a gray vector basemap and the MapNotesLayer
+// as its operational layer for displaying user notes.
 const webMap = new WebMap({
   basemap: "gray-vector",
   layers: [mapNotesLayer],
 });
 
-// Set the web map on the view element.
+// Assign the configured WebMap to the map view element,
+// making it visible and interactive in the application UI.
 viewElement.map = webMap;
 
-// Destructure the individual layers from the map notes layer.
-const { pointLayer, polylineLayer, polygonLayer, textLayer } = mapNotesLayer;
+// -----------------------------------------------------------------------
+// SketchViewModels
+// -----------------------------------------------------------------------
 
-// Create a separate SketchViewModel for each geometry type (point, polyline, polygon, text).
-// This allows independent drawing and editing workflows for each type of map note.
-// The createSketchViewModel factory function wires up event handling and UI integration.
+// Instantiate a dedicated SketchViewModel for each geometry type (point, polyline, polygon, text),
+// enabling independent drawing and editing workflows tailored to each map note type.
+// The createSketchViewModel factory function encapsulates event handling and UI integration
+// for modularity and maintainability.
 const pointSketchViewModel = createSketchViewModel({
-  view: viewElement.view,
-  layer: pointLayer,
   action: drawPointAction,
+  layer: pointLayer,
+  view: viewElement.view,
 });
 const polygonSketchViewModel = createSketchViewModel({
-  view: viewElement.view,
-  layer: polygonLayer,
   action: drawPolygonAction,
+  layer: polygonLayer,
+  view: viewElement.view,
 });
 const polylineSketchViewModel = createSketchViewModel({
-  view: viewElement.view,
-  layer: polylineLayer,
   action: drawPolylineAction,
+  layer: polylineLayer,
+  view: viewElement.view,
 });
 const textSketchViewModel = createSketchViewModel({
-  view: viewElement.view,
-  layer: textLayer,
   action: drawTextAction,
+  layer: textLayer,
+  view: viewElement.view,
 });
 
-// Event listener for deleting all map note graphics.
+// -----------------------------------------------------------------------
+// Event Listeners
+// -----------------------------------------------------------------------
+
+// Event listener that synchronizes the title input field with the selected map note
+// graphic's title attribute whenever the user modifies the input value.
+attributeTitleInput.addEventListener("calciteInputTextChange", () => {
+  if (state.activeSketchViewModel) {
+    state.activeSketchViewModel.complete();
+  }
+});
+
+// Event listener that initiates the deletion workflow, prompting the user to confirm before
+// removing all map note graphics from the map.
 deleteAction.addEventListener("click", () => {
   deleteAction.indicator = true;
   deleteDialog.open = true;
 });
 
-// Event listener for confirming deletion of all map note graphics.
+// Event listener that executes the deletion of all map note graphics after user confirmation,
+// then resets the UI state.
 deleteConfirmButton.addEventListener("click", () => {
   pointLayer?.removeAll();
   polylineLayer?.removeAll();
@@ -201,25 +245,31 @@ deleteConfirmButton.addEventListener("click", () => {
   resetActions();
 });
 
-// Event listener for canceling deletion of all map note graphics.
+// Event listener that aborts the deletion workflow, closes the confirmation dialog,
+// and restores the UI to its previous state.
 deleteCancelButton.addEventListener("click", () => {
   deleteDialog.open = false;
   resetActions();
 });
 
-// Event listener for drawing point map note graphics.
+// Event listener that initializes the workflow for creating a new point map note graphic,
+// including UI updates and drawing activation.
 drawPointAction.addEventListener("click", () => {
-  // Initialize a new map note by resetting actions, disabling updates,
-  // and incrementing the map note number.
+  // Prepare the application for creating a new map note by clearing active tools,
+  // disabling editing of existing graphics, and incrementing the note counter
+  // to assign a unique default title.
   initializeNewMapNote();
 
-  // Show the attribute panel when a new graphic is created.
+  // Display the attribute panel to prompt the user to enter a title and
+  // details for the new map note graphic.
   attributePanel.hidden = false;
 
-  // Set the indicator for the draw point action.
+  // Visually activate the draw point action to indicate to the user that the
+  // point drawing tool is currently selected.
   drawPointAction.indicator = true;
 
-  // Create a new point graphic with a simple marker symbol.
+  // Begin the drawing interaction by creating a new point graphic on the map,
+  // using a visually distinct circular simple marker symbol.
   pointSketchViewModel.create("point", {
     graphicSymbol: new SimpleMarkerSymbol({
       style: "circle",
@@ -233,19 +283,24 @@ drawPointAction.addEventListener("click", () => {
   });
 });
 
-// Event listener for drawing polygon map note graphics.
+// Event listener that initiates the workflow for creating a new polygon map note graphic,
+// including UI updates and drawing tool activation.
 drawPolygonAction.addEventListener("click", () => {
-  // Initialize a new map note by resetting actions, disabling updates,
-  // and incrementing the map note number.
+  // Prepare the application for creating a new polygon map note by clearing active tools,
+  // disabling editing of existing graphics, and incrementing the note counter
+  // to assign a unique default title.
   initializeNewMapNote();
 
-  // Show the attribute panel when a new graphic is created.
+  // Display the attribute panel to prompt the user to enter a title and
+  // details for the new map note graphic.
   attributePanel.hidden = false;
 
-  // Set the indicator for the draw polygon action.
+  // Visually activate the draw polygon action to indicate to the user that the
+  // polygon drawing tool is currently selected.
   drawPolygonAction.indicator = true;
 
-  // Create a new polygon graphic with a simple fill symbol.
+  // Begin the drawing interaction by creating a new polygon graphic on the map,
+  // using a visually distinct simple fill symbol and outline.
   polygonSketchViewModel.create("polygon", {
     graphicSymbol: new SimpleFillSymbol({
       color: "#43AA8B77",
@@ -257,19 +312,24 @@ drawPolygonAction.addEventListener("click", () => {
   });
 });
 
-// Event listener for drawing polyline map note graphics.
+// Event listener that initiates the workflow for creating a new polyline map note graphic,
+// including UI updates and drawing tool activation.
 drawPolylineAction.addEventListener("click", () => {
-  // Initialize a new map note by resetting actions, disabling updates,
-  // and incrementing the map note number.
+  // Prepare the application for creating a new polyline map note by clearing active tools,
+  // disabling editing of existing graphics, and incrementing the note counter
+  // to assign a unique default title.
   initializeNewMapNote();
 
-  // Show the attribute panel when a new graphic is created.
+  // Display the attribute panel to prompt the user to enter a title and
+  // details for the new map note graphic.
   attributePanel.hidden = false;
 
-  // Set the indicator for the draw polyline action.
+  // Visually activate the draw polyline action to indicate to the user that the
+  // polyline drawing tool is currently selected.
   drawPolylineAction.indicator = true;
 
-  // Create a new polyline graphic with a simple line symbol.
+  // Begin the drawing interaction by creating a new polyline graphic on the map,
+  // using a visually distinct simple line symbol.
   polylineSketchViewModel.create("polyline", {
     graphicSymbol: new SimpleLineSymbol({
       color: "#F9A602FF",
@@ -278,19 +338,24 @@ drawPolylineAction.addEventListener("click", () => {
   });
 });
 
-// Event listener for drawing text map note graphics.
+// Event listener that initiates the workflow for creating a new text map note graphic,
+// including UI updates and drawing tool activation.
 drawTextAction.addEventListener("click", () => {
-  // Initialize a new map note by resetting actions, disabling updates,
-  // and incrementing the map note number.
+  // Prepare the application for creating a new text map note by clearing active tools,
+  // disabling editing of existing graphics, and incrementing the note counter
+  // to assign a unique default title.
   initializeNewMapNote();
 
-  // Show the attribute panel when a new graphic is created.
+  // Display the attribute panel to prompt the user to enter a title and
+  // details for the new map note graphic.
   attributePanel.hidden = false;
 
-  // Set the indicator for the draw text action.
+  // Visually activate the draw text action to indicate to the user that the
+  // text drawing tool is currently selected.
   drawTextAction.indicator = true;
 
-  // Create a new graphic with a text symbol.
+  // Begin the drawing interaction by creating a new text graphic on the map,
+  // using a visually distinct text symbol.
   textSketchViewModel.create("point", {
     graphicSymbol: new TextSymbol({
       color: "#F94144FF",
@@ -304,74 +369,83 @@ drawTextAction.addEventListener("click", () => {
   });
 });
 
-// Event listener for updating the graphic title attribute
-// when the input value changes.
-attributeTitleInput.addEventListener("calciteInputTextChange", () => {
-  if (state.activeSketchViewModel) {
-    state.activeSketchViewModel.complete();
-  }
-});
-
-// Event listener for closing the save results dialog.
+// Event listener that resets the UI state when the save results dialog is closed,
+// preparing the application for further user actions.
 saveResultsDialog.addEventListener("calciteDialogClose", () => {
   saveLoader.hidden = false;
   saveSuccessNotice.open = false;
   saveErrorNotice.open = false;
 });
 
-// Event listener for saving the WebMap.
+// Event listener that handles the workflow for saving the current WebMap,
+// including UI feedback for success or error states.
 saveWebMapButton.addEventListener("click", async () => {
   try {
-    // Open the save results dialog.
+    // Open the dialog that displays the outcome of the web map save operation,
+    // providing feedback on success or failure.
     saveResultsDialog.open = true;
 
-    // Get the WebMap title from the input field.
+    // Retrieve the user-provided title for the WebMap from the input field,
+    // or use a default title if none is specified.
     const title = webMapTitleInput.value || "Map Notes WebMap";
 
-    // Update the WebMap with the current view.
+    // Synchronize the WebMap's state with the current map view, ensuring all user changes and
+    // map notes are included before saving.
     await webMap.updateFrom(viewElement.view);
 
-    // Create a new PortalItem with the WebMap title.
+    // Create a new PortalItem instance representing the WebMap, including its title and description,
+    // to prepare it for saving to the portal.
     const portalItem = new PortalItem({
       description:
         "WebMap created with the ArcGIS Maps SDK for JavaScript MapNotesLayer sample.",
       title,
     });
 
-    // Save the WebMap as a new PortalItem.
+    // Save the current WebMap as a new PortalItem in the user's portal,
+    // making it accessible and shareable online.
     const saveAsResult = await webMap.saveAs(portalItem);
 
-    // Update the save success link with the new PortalItem URL.
+    // Update the success link to provide direct access to the newly saved WebMap,
+    // setting its URL and display title from the new PortalItem.
     saveSuccessLink.href = `${saveAsResult.portal.url}/home/item.html?id=${saveAsResult.id}`;
     saveSuccessLink.textContent = saveAsResult.title ?? "";
 
-    // Show the success loader and notice.
+    // Hide the loading indicator and display a success notice to inform the user
+    // that the WebMap was saved successfully.
     saveLoader.hidden = true;
     saveSuccessNotice.open = true;
   } catch (error) {
-    // Display the error message if the WebMap save fails.
+    // Display a detailed error message and visual feedback if the WebMap save operation fails,
+    // helping the user understand what went wrong.
     saveErrorMessage.textContent = (error as Error).message;
     saveLoader.hidden = true;
     saveErrorNotice.open = true;
   }
 });
 
-// Event listener for selecting and updating map note graphics.
+// Event listener that manages the workflow for selecting existing map note graphics and
+// enabling their attribute updates, including toggling between selection and editing modes.
 selectAction.addEventListener("click", () => {
-  // If the select action is already active, reset all actions
-  // and disable updates.
+  // If the select action is already active, reset all UI actions and
+  // disable editing mode to exit selection.
   if (selectAction.indicator) {
     resetActions();
     disableUpdates();
     return;
   }
-  // Otherwise, reset all actions and enable updates.
+  // Otherwise, reset all UI actions and enable editing mode, allowing the user to select and
+  // update map note graphics.
   resetActions();
   selectAction.indicator = true;
   allowUpdates();
 });
 
-// Function to allow updates on all SketchViewModels.
+// -----------------------------------------------------------------------
+// Functions
+// -----------------------------------------------------------------------
+
+// Enables update mode on all SketchViewModels, allowing users to select and edit
+// any map note graphic by clicking on it.
 function allowUpdates() {
   pointSketchViewModel.updateOnGraphicClick = true;
   polylineSketchViewModel.updateOnGraphicClick = true;
@@ -379,12 +453,13 @@ function allowUpdates() {
   textSketchViewModel.updateOnGraphicClick = true;
 }
 
-// Function for creating attributes for a new graphic.
+// Sets initial attributes, popup template, and symbol properties
+// for a newly created map note graphic based on user input.
 function createAttributes(
   action: HTMLCalciteActionElement,
   event: CreateEvent,
 ) {
-  // If the event state is complete.
+  // Only proceed if the graphic creation event has finished and a new graphic exists.
   if (event.state === "complete" && event.graphic) {
     // Clone the current symbol and update the text if it's a text symbol.
     const symbol = event.graphic.symbol?.clone();
@@ -393,52 +468,52 @@ function createAttributes(
       event.graphic.symbol = symbol;
     }
 
-    // Set the initial attributes for the new graphic.
+    // Assign the user-provided title as an attribute on the new graphic.
     event.graphic.attributes = {
       title: attributeTitleInput.value || "",
     };
 
-    // Add a popup template to the new graphic.
+    // Configure the popup to display the graphic's title when clicked.
     event.graphic.popupTemplate = {
       title: "{title}",
     };
 
-    // Clear the action indicator and hide the attribute panel.
+    // Reset the action's visual indicator and close the attribute editing panel.
     action.indicator = false;
-
-    // Hide the attribute panel after creating a new graphic.
     attributePanel.hidden = true;
 
-    // Re-enable all actions after creating a new graphic.
+    // Enable all drawing actions so the user can create or edit additional map notes.
     drawActionBar.querySelectorAll("calcite-action").forEach((action) => {
       action.disabled = false;
     });
   }
 }
 
-// Function to create a SketchViewModel and set up event listeners.
+// Factory function to initialize a SketchViewModel for a specific geometry type,
+// wiring up creation and update event handlers for map note graphics.
 function createSketchViewModel(options: {
-  view: MapView;
-  layer: GraphicsLayer | null | undefined;
   action: HTMLCalciteActionElement;
+  layer: GraphicsLayer | null | undefined;
+  view: MapView;
 }) {
-  // Create a new SketchViewModel with the provided options.
+  // Instantiate a SketchViewModel for the specified layer and view,
+  // disabling update-on-click by default.
   const sketchViewModel = new SketchViewModel({
     view: options.view,
     layer: options.layer,
     updateOnGraphicClick: false,
   });
 
-  // Set up event listeners for the SketchViewModel.
+  // Attach handlers for create and update events to manage drawing and editing workflows.
   sketchViewModel.on("create", (event) => {
-    // Disable all actions while creating a new graphic.
+    // Temporarily disable all drawing actions to prevent user interaction during graphic creation.
     drawActionBar.querySelectorAll("calcite-action").forEach((action) => {
       action.disabled = true;
     });
     createAttributes(options.action, event);
   });
   sketchViewModel.on("update", (event) => {
-    // Disable all actions while updating a graphic.
+    // Temporarily disable all drawing actions to prevent user interaction during graphic updates.
     drawActionBar.querySelectorAll("calcite-action").forEach((action) => {
       action.disabled = true;
     });
@@ -448,7 +523,8 @@ function createSketchViewModel(options: {
   return sketchViewModel;
 }
 
-// Function to disable updates on all SketchViewModels.
+// Disables update-on-click for all SketchViewModels, preventing users from
+// selecting and editing existing graphics.
 function disableUpdates() {
   pointSketchViewModel.updateOnGraphicClick = false;
   polylineSketchViewModel.updateOnGraphicClick = false;
@@ -456,69 +532,77 @@ function disableUpdates() {
   textSketchViewModel.updateOnGraphicClick = false;
 }
 
-// Function to initialize a new map note.
+// Prepares the UI and state for drawing a new map note, resetting actions,
+// disabling updates, incrementing the note number, and setting a default title.
 function initializeNewMapNote() {
-  // Reset all drawing actions.
+  // Clear all active drawing states and indicators to prepare for a new map note.
   resetActions();
 
-  // Disable updates on SketchViewModels.
+  // Prevent editing of existing graphics while starting a new drawing.
   disableUpdates();
 
-  // Increment the current map note number.
+  // Advance the map note counter to ensure each new note has a unique default title.
   state.currentMapNoteNumber++;
 
-  // Set a default title for the new graphic.
+  // Assign a unique, descriptive default title to the new map note graphic
+  // using the updated note number.
   attributeTitleInput.value = `Map Note ${state.currentMapNoteNumber}`;
 }
 
-// Function for resetting all drawing actions.
+// Resets all drawing action indicators and cancels any active drawing
+// or editing sessions for map notes.
 function resetActions() {
-  // Set all action indicators to false.
+  // Visually reset all drawing tool indicators in the UI so none appear active.
   drawActionBar.querySelectorAll("calcite-action").forEach((action) => {
     action.indicator = false;
   });
-  // Cancel all active SketchViewModels.
+
+  // Abort any ongoing drawing or editing operations for all map note types to ensure a clean state.
   pointSketchViewModel.cancel();
   polylineSketchViewModel.cancel();
   polygonSketchViewModel.cancel();
   textSketchViewModel.cancel();
 }
 
-// Function for updating the attributes of an existing graphic.
+// Synchronizes the UI and attributes when editing an existing map note graphic,
+// ensuring updates are reflected in both.
 function updateAttributes(
   sketchViewModel: SketchViewModel,
   event: UpdateEvent,
 ) {
-  // If the update is starting.
+  // When the user initiates editing, populate the UI with the
+  // current attributes of the selected graphic.
   if (event.state === "start") {
-    // Populate the input with the current graphic title.
     attributeTitleInput.value = event.graphics[0].attributes?.title || "";
 
-    // Set the active SketchViewModel when the update starts.
+    // Track which SketchViewModel is currently being edited to enable correct UI and
+    // state management during the update process.
     state.activeSketchViewModel = sketchViewModel;
 
-    // If the update is complete.
+    // When editing is finished, save changes to the graphic and reset the UI to its default state.
   } else if (event.state === "complete") {
-    // Update the graphic title attribute.
+    // Save the updated title from the input field back to the graphic's attributes,
+    // ensuring the user's changes are persisted.
     event.graphics[0].attributes.title = attributeTitleInput.value || "";
 
-    // Clone the current symbol and update the text if it's a text symbol.
+    // If the graphic uses a text symbol, clone it and update its text property to match the new title.
     const symbol = event.graphics[0].symbol?.clone();
     if (symbol && symbol.type === "text") {
       symbol.text = attributeTitleInput.value || "";
       event.graphics[0].symbol = symbol;
     }
 
-    // Blur the input so it loses focus.
+    // Remove focus from the input field after editing to signal completion and improve user experience.
     attributeTitleInput.blur();
 
-    // Clear the active SketchViewModel.
+    // Reset the reference to the active SketchViewModel, marking the end of the current editing session.
     state.activeSketchViewModel = null;
 
-    // Hide the attribute panel after updating a graphic.
+    // Hide the attribute editing panel to return the UI to its default state after a graphic update.
     attributePanel.hidden = true;
 
-    // Enable all actions after updating a graphic.
+    // Re-enable all drawing and editing actions so the user can continue
+    // interacting with map notes after an update.
     drawActionBar.querySelectorAll("calcite-action").forEach((action) => {
       action.disabled = false;
     });
