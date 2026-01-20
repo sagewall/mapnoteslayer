@@ -48,10 +48,12 @@ const deleteAction = document.querySelector(
   "#delete-action",
 )! as HTMLCalciteActionElement;
 
+// Button element for confirming deletion of all map note graphics.
 const deleteConfirmButton = document.querySelector(
   "#delete-confirm-button",
 )! as HTMLCalciteButtonElement;
 
+// Button element for canceling deletion of all map note graphics.
 const deleteCancelButton = document.querySelector(
   "#delete-cancel-button",
 )! as HTMLCalciteButtonElement;
@@ -136,13 +138,13 @@ const webMapTitleInput = document.querySelector(
   "#webmap-title-input-text",
 )! as HTMLCalciteInputTextElement;
 
-// Current updating SketchViewModel.
+// The current SketchViewModel that is being updated.
 let currentUpdatingSketchViewModel: SketchViewModel | null = null;
 
-// Map notes layer for storing map note graphics.
+// Create a MapNotesLayer to store all user-drawn map note graphics (points, lines, polygons, and text)
 const mapNotesLayer = new MapNotesLayer();
 
-// Web map for displaying the map notes layer.
+// Create a WebMap with a gray vector basemap and the map notes layer.
 const webMap = new WebMap({
   basemap: "gray-vector",
   layers: [mapNotesLayer],
@@ -154,8 +156,9 @@ viewElement.map = webMap;
 // Destructure the individual layers from the map notes layer.
 const { pointLayer, polylineLayer, polygonLayer, textLayer } = mapNotesLayer;
 
-// Create SketchViewModels for each geometry type using the
-// createSketchViewModel factory function.
+// Create a separate SketchViewModel for each geometry type (point, polyline, polygon, text).
+// This allows independent drawing and editing workflows for each type of map note.
+// The createSketchViewModel factory function wires up event handling and UI integration.
 const pointSketchViewModel = createSketchViewModel({
   view: viewElement.view,
   layer: pointLayer,
@@ -300,7 +303,6 @@ drawTextAction.addEventListener("click", () => {
       },
       haloColor: "#00000077",
       haloSize: 1,
-      // text: attributeTitleInput.value || "",
     }),
   });
 });
@@ -345,6 +347,8 @@ saveWebMapButton.addEventListener("click", async () => {
     // Update the save success link with the new PortalItem URL.
     saveSuccessLink.href = `${saveAsResult.portal.url}/home/item.html?id=${saveAsResult.id}`;
     saveSuccessLink.textContent = saveAsResult.title ?? "";
+
+    // Show the success loader and notice.
     saveLoader.hidden = true;
     saveSuccessNotice.open = true;
   } catch (error) {
@@ -383,6 +387,7 @@ function createAttributes(
   action: HTMLCalciteActionElement,
   event: CreateEvent,
 ) {
+  // If the event state is complete.
   if (event.state === "complete" && event.graphic) {
     // Clone the current symbol and update the text if it's a text symbol.
     const symbol = event.graphic.symbol?.clone();
@@ -472,14 +477,17 @@ function updateAttributes(
   sketchViewModel: SketchViewModel,
   event: UpdateEvent,
 ) {
+  // If the update is starting.
   if (event.state === "start") {
-    // When the update starts, populate the input with the current graphic title.
+    // Populate the input with the current graphic title.
     attributeTitleInput.value = event.graphics[0].attributes?.title || "";
 
     // Set the current updating SketchViewModel when the update starts.
     currentUpdatingSketchViewModel = sketchViewModel;
+
+    // If the update is complete.
   } else if (event.state === "complete") {
-    // When the update is complete, update the graphic title attribute.
+    // Update the graphic title attribute.
     event.graphics[0].attributes.title = attributeTitleInput.value || "";
 
     // Clone the current symbol and update the text if it's a text symbol.
