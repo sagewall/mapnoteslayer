@@ -260,10 +260,6 @@ drawPointAction.addEventListener("click", () => {
   // to assign a unique default title.
   initializeNewMapNote();
 
-  // Display the attribute panel to prompt the user to enter a title and
-  // details for the new map note graphic.
-  attributePanel.hidden = false;
-
   // Visually activate the draw point action to indicate to the user that the
   // point drawing tool is currently selected.
   drawPointAction.indicator = true;
@@ -291,10 +287,6 @@ drawPolygonAction.addEventListener("click", () => {
   // to assign a unique default title.
   initializeNewMapNote();
 
-  // Display the attribute panel to prompt the user to enter a title and
-  // details for the new map note graphic.
-  attributePanel.hidden = false;
-
   // Visually activate the draw polygon action to indicate to the user that the
   // polygon drawing tool is currently selected.
   drawPolygonAction.indicator = true;
@@ -320,10 +312,6 @@ drawPolylineAction.addEventListener("click", () => {
   // to assign a unique default title.
   initializeNewMapNote();
 
-  // Display the attribute panel to prompt the user to enter a title and
-  // details for the new map note graphic.
-  attributePanel.hidden = false;
-
   // Visually activate the draw polyline action to indicate to the user that the
   // polyline drawing tool is currently selected.
   drawPolylineAction.indicator = true;
@@ -345,10 +333,6 @@ drawTextAction.addEventListener("click", () => {
   // disabling editing of existing graphics, and incrementing the note counter
   // to assign a unique default title.
   initializeNewMapNote();
-
-  // Display the attribute panel to prompt the user to enter a title and
-  // details for the new map note graphic.
-  attributePanel.hidden = false;
 
   // Visually activate the draw text action to indicate to the user that the
   // text drawing tool is currently selected.
@@ -541,12 +525,19 @@ function initializeNewMapNote() {
   // Prevent editing of existing graphics while starting a new drawing.
   disableUpdates();
 
+  // Prevent deletion while drawing a new map note.
+  deleteAction.disabled = true;
+
   // Advance the map note counter to ensure each new note has a unique default title.
   state.currentMapNoteNumber++;
 
   // Assign a unique, descriptive default title to the new map note graphic
   // using the updated note number.
   attributeTitleInput.value = `Map Note ${state.currentMapNoteNumber}`;
+
+  // Display the attribute panel to prompt the user to enter a title and
+  // details for the new map note graphic.
+  attributePanel.hidden = false;
 }
 
 // Resets all drawing action indicators and cancels any active drawing

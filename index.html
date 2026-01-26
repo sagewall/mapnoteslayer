@@ -10,33 +10,6 @@
     <calcite-shell class="calcite-mode-auto">
       <arcgis-map center="-111.79, 41.28" zoom="12">
         <arcgis-zoom slot="top-left"></arcgis-zoom>
-        <arcgis-expand
-          expand-icon="question"
-          expand-tooltip="How to use this sample"
-          expanded
-          slot="top-left"
-        >
-          <calcite-panel class="max-width-450" heading="Instructions">
-            <calcite-list>
-              <calcite-list-item
-                description="Use the action bar in the top right to draw points, polylines, polygons, or text notes on the map. The delete action removes all graphics. When drawing, an attribute panel appears to let you set a title. For text notes, the title becomes the displayed text."
-                label="Creating new map notes"
-              ></calcite-list-item>
-              <calcite-list-item
-                description="After adding a graphic, click it to view its popup with the title you entered."
-                label="Viewing popup information"
-              ></calcite-list-item>
-              <calcite-list-item
-                description="Use the select action to pick a graphic and move it, edit its vertices (for lines and polygons), or update its title. The attribute panel will open for editing. To disable editing, click the select action again or choose another action."
-                label="Selecting and editing features"
-              ></calcite-list-item>
-              <calcite-list-item
-                description="Click the Save button to create a new WebMap with your current map notes. You can set a title for the WebMap before saving."
-                label="Saving"
-              ></calcite-list-item>
-            </calcite-list>
-          </calcite-panel>
-        </arcgis-expand>
 
         <calcite-action-bar
           expand-disabled
@@ -143,55 +116,57 @@
         </calcite-panel>
       </arcgis-map>
 
-      <calcite-dialog heading="Delete All Graphics" id="delete-dialog" modal>
-        <calcite-panel>
-          <calcite-notice icon id="delete-notice" kind="danger" open>
-            <div slot="title">All graphics will be deleted</div>
-            <div id="delete-message" slot="message">
-              <span
-                >Are you sure you want to delete all graphics?<br />To delete a
-                single graphic, select it and press the delete key.</span
-              >
-            </div>
-          </calcite-notice>
-          <div class="buttons-container">
-            <calcite-button appearance="solid" id="delete-confirm-button"
-              >Delete</calcite-button
-            >
-            <calcite-button appearance="outline" id="delete-cancel-button"
-              >Cancel</calcite-button
-            >
-          </div>
-        </calcite-panel>
+      <calcite-dialog
+        heading="Delete All Graphics"
+        id="delete-dialog"
+        modal
+        width="s"
+      >
+        <calcite-notice icon id="delete-notice" kind="danger" open>
+          <div slot="title">All graphics will be deleted</div>
+          <span slot="message"
+            >Are you sure you want to delete all graphics?<br />To delete a
+            single graphic, select it and press the delete key.</span
+          >
+        </calcite-notice>
+        <calcite-button
+          appearance="outline"
+          id="delete-cancel-button"
+          slot="footer-end"
+          >Cancel</calcite-button
+        >
+        <calcite-button
+          appearance="solid"
+          kind="danger"
+          id="delete-confirm-button"
+          slot="footer-end"
+          >Delete</calcite-button
+        >
       </calcite-dialog>
 
       <calcite-dialog
         heading="Saved Webmap Information"
         id="save-results-dialog"
         modal
+        width="s"
       >
-        <calcite-panel>
-          <calcite-loader
-            id="save-loader"
-            label="Saving Webmap"
-            text="Saving Webmap"
-          ></calcite-loader>
-          <calcite-notice icon id="save-success-notice" kind="success">
-            <div slot="title">The Webmap has been saved successfully</div>
-            <div slot="message">
-              <calcite-link
-                id="save-success-link"
-                slot="message"
-                target="_blank"
-                >Test</calcite-link
-              >
-            </div>
-          </calcite-notice>
-          <calcite-notice icon id="save-error-notice" kind="danger">
-            <div slot="title">The Webmap could not be saved</div>
-            <div id="save-error-message" slot="message"></div>
-          </calcite-notice>
-        </calcite-panel>
+        <calcite-loader
+          id="save-loader"
+          label="Saving Webmap"
+          text="Saving Webmap"
+        ></calcite-loader>
+        <calcite-notice icon id="save-success-notice" kind="success">
+          <div slot="title">The Webmap has been saved successfully</div>
+          <calcite-link
+            id="save-success-link"
+            slot="message"
+            target="_blank"
+          ></calcite-link>
+        </calcite-notice>
+        <calcite-notice icon id="save-error-notice" kind="danger">
+          <div slot="title">The Webmap could not be saved</div>
+          <div id="save-error-message" slot="message"></div>
+        </calcite-notice>
       </calcite-dialog>
     </calcite-shell>
     <script type="module" src="/src/main.ts"></script>
